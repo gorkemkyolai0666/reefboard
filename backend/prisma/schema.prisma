@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Center {
+  id            String   @id @default(uuid())
+  name          String
+  phone         String   @default("")
+  address       String   @default("")
+  city          String   @default("")
+  district      String   @default("")
+  maxDepth      Int      @default(40)
+  certBody      String   @default("PADI")
+  latitude      Float?
+  longitude     Float?
+  timezone      String   @default("Europe/Istanbul")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  users         User[]
+  students      Student[]
+  courses       Course[]
+  diveLogs      DiveLog[]
+  equipment     Equipment[]
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  role         String   @default("instructor")
+  centerId     String
+  center       Center   @relation(fields: [centerId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum CertLevel {
+  open_water
+  advanced_open_water
+  rescue_diver
+  divemaster
+  instructor
+  none
+}
+
+enum StudentStatus {
+  active
+  graduated
+  inactive
+  suspended
+}
+
+model Student {
+  id              String        @id @default(uuid())
+  firstName       String
+  lastName        String
+  email           String
+  phone           String        @default("")
+  birthDate       DateTime?
+  certLevel       CertLevel     @default(none)
+  certNumber      String?
+  healthClearance Boolean       @default(false)
+  status          StudentStatus @default(active)
+  totalDives      Int           @default(0)
+  notes           String?
+  centerId        String
+  center          Center        @relation(fields: [centerId], references: [id])
+  enrollments     Enrollment[]
+  diveLogs        DiveLog[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+enum CourseType {
+  open_water
+  advanced_open_water
+  rescue_diver
+  divemaster
+  specialty_nitrox
+  specialty_deep
+  specialty_wreck
+  specialty_night
+  specialty_underwater_photo
+  first_aid
+  try_dive
+}
+
+enum CourseStatus {
+  scheduled
+  in_progress
+  completed
+  cancelled
+}
+
+model Course {
+  id              String       @id @default(uuid())
+  title           String
+  courseType       CourseType
+  status          CourseStatus  @default(scheduled)
+  instructorName  String
+  maxParticipants Int          @default(6)
+  price           Float        @default(0)
+  startDate       DateTime
+  endDate         DateTime
+  location        String?
+  notes           String?
+  centerId        String
+  center          Center       @relation(fields: [centerId], references: [id])
+  enrollments     Enrollment[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+enum EnrollmentStatus {
+  enrolled
+  completed
+  dropped
+  failed
+}
+
+model Enrollment {
+  id          String           @id @default(uuid())
+  studentId   String
+  student     Student          @relation(fields: [studentId], references: [id])
+  courseId     String
+  course      Course           @relation(fields: [courseId], references: [id])
+  status      EnrollmentStatus @default(enrolled)
+  grade       String?
+  completedAt DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([studentId, courseId])
+}
+
+enum Visibility {
+  poor
+  fair
+  good
+  excellent
+}
+
+model DiveLog {
+  id            String     @id @default(uuid())
+  diveNumber    Int
+  studentId     String
+  student       Student    @relation(fields: [studentId], references: [id])
+  diveSite      String
+  diveDate      DateTime
+  maxDepth      Float
+  duration      Int
+  waterTemp     Float?
+  visibility    Visibility @default(good)
+  buddy         String?
+  notes         String?
+  centerId      String
+  center        Center     @relation(fields: [centerId], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+enum EquipmentType {
+  bcd
+  regulator
+  wetsuit
+  drysuit
+  mask
+  fins
+  tank
+  computer
+  torch
+  camera
+  weight_belt
+  snorkel
+}
+
+enum EquipmentCondition {
+  excellent
+  good
+  fair
+  needs_service
+  out_of_service
+}
+
+model Equipment {
+  id              String             @id @default(uuid())
+  name            String
+  equipmentType   EquipmentType
+  serialNumber    String?
+  brand           String?
+  condition       EquipmentCondition @default(good)
+  purchaseDate    DateTime?
+  lastServiceDate DateTime?
+  nextServiceDate DateTime?
+  isRental        Boolean            @default(true)
+  dailyRate       Float              @default(0)
+  notes           String?
+  centerId        String
+  center          Center             @relation(fields: [centerId], references: [id])
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+}

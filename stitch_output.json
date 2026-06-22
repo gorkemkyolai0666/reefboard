@@ -1,0 +1,36 @@
+{
+  "project": "reefboard",
+  "designSystem": {
+    "colors": {
+      "primary": "#0B1D3A",
+      "secondary": "#FF6B6B",
+      "accent": "#00D4AA",
+      "neutral": "#C09B56",
+      "background": "#F0F4F8",
+      "backgroundDark": "#060E1A",
+      "surface": "#FFFFFF",
+      "surfaceDark": "#0B1D3A"
+    },
+    "typography": {
+      "headingFont": "Playfair Display",
+      "bodyFont": "Inter",
+      "headingSizes": { "h1": "2.25rem", "h2": "1.875rem", "h3": "1.5rem" },
+      "bodySize": "0.875rem"
+    },
+    "spacing": {
+      "base": "4px",
+      "sm": "8px",
+      "md": "16px",
+      "lg": "24px",
+      "xl": "32px"
+    },
+    "borderRadius": {
+      "sm": "4px",
+      "default": "8px",
+      "md": "12px",
+      "lg": "16px",
+      "xl": "20px"
+    }
+  },
+  "createdAt": "2026-06-22T16:42:00.000Z"
+}
